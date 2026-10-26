@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abhishek & Simmi - Fiery Romantic Experience</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@800;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        montserrat: ['Montserrat', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        crimson: {
+                            500: '#ff003c',
+                            600: '#e60033',
+                            700: '#cc002e',
+                            800: '#990022',
+                            900: '#660017',
+                            950: '#33000c'
+                        },
+                        charcoal: {
+                            800: '#1a1818',
+                            900: '#0f0d0e',
+                            950: '#050404'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Reset & Custom Scrollbar */
+        * {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #050404;
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Fiery Text Shadow Effects */
+        .text-glow-crimson {
+            text-shadow: 0 0 10px #ff003c, 0 0 20px #ff003c, 0 0 40px #990022, 0 0 80px #660017;
+        }
+        .text-glow-orange {
+            text-shadow: 0 0 10px #ff6600, 0 0 25px #ff3300, 0 0 50px #cc0000;
+        }
+        
+        /* Box Glows */
+        .box-glow-crimson {
+            box-shadow: 0 0 25px rgba(255, 0, 60, 0.4), inset 0 0 15px rgba(255, 0, 60, 0.3);
+        }
+        .box-glow-intense {
+            box-shadow: 0 0 40px rgba(255, 0, 60, 0.7), 0 0 80px rgba(255, 102, 0, 0.4);
+        }
+
+        /* Animated Angry Emoji Badge */
+        @keyframes angryPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 15px #ff003c); }
+            25% { transform: scale(1.15) rotate(-6deg); filter: drop-shadow(0 0 35px #ff002b); }
+            50% { transform: scale(1.05) rotate(6deg); filter: drop-shadow(0 0 25px #ff6600); }
+            75% { transform: scale(1.2) rotate(-3deg); filter: drop-shadow(0 0 40px #ff0000); }
+        }
+        .animate-angry-emoji {
+            animation: angryPulse 1.6s infinite ease-in-out;
+        }
+
+        /* Pulse Heart Animation */
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.18); }
+        }
+        .animate-heartbeat {
+            animation: heartPulse 1.2s infinite ease-in-out;
+        }
+
+        /* Screen Glitch Overlay Effect */
+        @keyframes heatDistort {
+            0% { opacity: 0.15; transform: translateY(0); }
+            50% { opacity: 0.25; transform: translateY(-2px); }
+            100% { opacity: 0.15; transform: translateY(0); }
+        }
+        .heat-overlay {
+            background: radial-gradient(circle, rgba(255,0,60,0.12) 0%, rgba(5,4,4,0.85) 80%);
+            animation: heatDistort 4s infinite ease-in-out;
+        }
+
+        /* Audio Visualizer Equalizer Bars */
+        .eq-bar {
+            width: 3.5px;
+            background: #ff003c;
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+    </style>
+</head>
+<body class="relative flex flex-col items-center justify-between min-h-screen w-full overflow-hidden bg-charcoal-950">
+
+    <!-- CANVAS BACKGROUND (Ember Particles & Explosions) -->
+    <canvas id="fireCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- HEAT DISTORTION OVERLAY -->
+    <div class="fixed inset-0 pointer-events-none heat-overlay z-0"></div>
+
+    <!-- TOP HEADER & AUDIO CONTROLLER -->
+    <header class="relative z-20 w-full px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
+        <!-- BRANDING LOGO -->
+        <div class="flex items-center gap-3">
+            <span class="text-2xl text-crimson-500 animate-pulse"><i class="fa-solid fa-fire"></i></span>
+            <span class="font-cinzel font-black tracking-widest text-sm md:text-base text-zinc-300">
+                A <span class="text-crimson-500">&</span> S
+            </span>
+        </div>
+
+        <!-- AUDIO CONTROL WIDGET -->
+        <div class="flex items-center gap-3 bg-charcoal-900/90 border border-crimson-900/60 px-4 py-2 rounded-full backdrop-blur-md shadow-lg border-opacity-50">
+            <!-- AUDIO VISUALIZER BARS -->
+            <div id="visualizer" class="flex items-end gap-1 h-5 w-8">
+                <div class="eq-bar h-2"></div>
+                <div class="eq-bar h-4"></div>
+                <div class="eq-bar h-1"></div>
+                <div class="eq-bar h-3"></div>
+            </div>
+            
+            <button id="audioToggle" class="text-xs font-montserrat font-bold tracking-wider text-zinc-300 hover:text-crimson-500 transition-colors flex items-center gap-2">
+                <i id="audioIcon" class="fa-solid fa-volume-xmark text-crimson-500"></i>
+                <span id="audioText">SOUND OFF</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN INTERACTIVE HERO SECTION -->
+    <main class="relative z-10 my-auto px-4 py-6 flex flex-col items-center justify-center text-center max-w-3xl mx-auto w-full">
+        
+        <!-- ANGRY EMOJI INTERACTIVE BADGE -->
+        <div class="mb-4 relative flex items-center justify-center cursor-pointer group" id="angryEmojiBadge">
+            <div id="angryEmojiIcon" class="text-6xl md:text-8xl animate-angry-emoji transition-transform group-hover:scale-125 select-none">
+                😡❤️‍🔥
+            </div>
+            <div class="absolute inset-0 blur-2xl bg-crimson-600/30 rounded-full -z-10 animate-pulse"></div>
+        </div>
+
+        <!-- PASSIONATE SUBHEADER -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-crimson-950/80 border border-crimson-800/50 mb-4">
+            <span class="w-2 h-2 rounded-full bg-crimson-500 animate-ping"></span>
+            <h2 class="font-cinzel text-xs md:text-sm tracking-[0.25em] text-crimson-400 uppercase font-bold">
+                🔥 A FIERY TEMPEST OF PASSION 🔥
+            </h2>
+        </div>
+
+        <!-- MAIN TITLE FOR ABHISHEK & SIMMI -->
+        <h1 class="font-montserrat font-black text-4xl sm:text-6xl md:text-7xl tracking-tight text-white mb-3 uppercase leading-tight">
+            ABHISHEK <span class="text-transparent bg-clip-text bg-gradient-to-r from-crimson-500 via-red-500 to-orange-500 text-glow-crimson">&</span> SIMMI
+        </h1>
+
+        <p class="font-cinzel font-black text-lg sm:text-2xl text-red-500 tracking-widest text-glow-orange mb-8 uppercase">
+            CAN'T ESCAPE THIS LOVE!
+        </p>
+
+        <!-- INTERACTIVE ACTION BUTTONS CONTAINER -->
+        <div class="relative w-full flex flex-col items-center justify-center">
+            
+            <div id="buttonArea" class="relative min-h-[140px] flex flex-col sm:flex-row items-center justify-center gap-6 w-full max-w-md">
+                
+                <!-- "YES" BUTTON -->
+                <button id="yesBtn" class="relative group px-8 py-4 w-full sm:w-1/2 bg-gradient-to-r from-crimson-700 via-crimson-600 to-red-700 hover:from-crimson-600 hover:to-orange-600 text-white font-black font-cinzel text-lg tracking-widest rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(255,0,60,0.6)] box-glow-crimson z-20">
+                    <span class="flex items-center justify-center gap-2">
+                        YES! <i class="fa-solid fa-fire text-yellow-400 group-hover:animate-bounce"></i>
+                    </span>
+                </button>
+
+                <!-- "NO" BUTTON (NEVER VANISHES, ALWAYS FLEES SAFELY IN VIEWPORT) -->
+                <button id="noBtn" class="px-8 py-4 w-full sm:w-1/2 bg-zinc-900/90 border-2 border-crimson-900/80 hover:border-crimson-600 text-zinc-300 font-bold font-cinzel text-sm tracking-wider rounded-xl transition-all duration-150 z-30 shadow-lg">
+                    NO WAY 😡
+                </button>
+
+            </div>
+
+            <!-- TAUNT DISPLAY BOX -->
+            <div id="tauntBox" class="min-h-[2rem] mt-4 text-xs md:text-sm font-semibold text-crimson-400/90 italic tracking-wide transition-opacity duration-300 opacity-0 px-4 py-1 rounded-lg bg-charcoal-900/60 border border-crimson-950/40">
+                <!-- Taunt text inserted dynamically -->
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER DEDICATION -->
+    <footer class="relative z-10 py-4 text-center text-xs font-montserrat text-zinc-500 tracking-widest">
+        ABHISHEK ❤️ SIMMI • FOREVER LOCKED IN FLAMES
+    </footer>
+
+    <!-- EXPLOSIVE VICTORY MODAL POPUP -->
+    <div id="victoryModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 bg-charcoal-950/90 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500">
+        <div class="relative max-w-lg w-full bg-gradient-to-b from-charcoal-900 to-crimson-950 border-2 border-crimson-600/80 rounded-2xl p-6 sm:p-8 text-center box-glow-intense transform scale-90 transition-transform duration-500 shadow-2xl" id="modalContent">
+            
+            <div class="text-6xl sm:text-7xl mb-4 animate-heartbeat">
+                ❤️‍🔥
+            </div>
+
+            <h3 class="font-montserrat font-black text-2xl sm:text-4xl text-white uppercase tracking-tight mb-2 text-glow-crimson">
+                BOUND FOREVER!
+            </h3>
+
+            <p class="font-cinzel text-sm sm:text-base text-crimson-400 font-bold tracking-wider mb-6">
+                SIMMI & ABHISHEK ARE DESTINED TOGETHER!
+            </p>
+
+            <div class="space-y-3 text-zinc-300 text-xs sm:text-sm leading-relaxed mb-6 border-t border-b border-crimson-900/60 py-4">
+                <p>🔥 No escape, no retreat, no second guesses!</p>
+                <p class="text-white font-semibold">Abhishek's heart belongs entirely to Simmi, forever burning with endless passion!</p>
+            </div>
+
+            <button id="closeModalBtn" class="px-8 py-3 bg-gradient-to-r from-crimson-600 to-red-600 hover:from-crimson-500 hover:to-orange-500 text-white font-black font-cinzel text-sm tracking-widest rounded-xl transition-all shadow-lg">
+                SEAL THIS LOVE ❤️
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT ARCHITECTURE -->
+    <script>
+        /* ==========================================================================
+           1. CANVAS FIERY EMBERS & EXPLOSION ENGINE
+           ========================================================================== */
+        const canvas = document.getElementById('fireCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Floating Ember Particle System
+        const ambientEmbers = [];
+        const explosionParticles = [];
+
+        class Ember {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 50;
+                this.size = Math.random() * 2.5 + 0.8;
+                this.speedY = Math.random() * 1.5 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.8;
+                this.opacity = Math.random() * 0.7 + 0.3;
+                this.color = Math.random() > 0.4 ? '#ff003c' : (Math.random() > 0.5 ? '#ff6600' : '#ffcc00');
+            }
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX + Math.sin(this.y * 0.01) * 0.3;
+                this.opacity -= 0.002;
+                if (this.y < -10 || this.opacity <= 0) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Initialize 70 ambient embers
+        for (let i = 0; i < 70; i++) {
+            ambientEmbers.push(new Ember());
+        }
+
+        // Explosion Flame Particle for "YES" Click & Angry Emoji Click
+        class ExplosionParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 6 + 2;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 12 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.gravity = 0.15;
+                this.decay = Math.random() * 0.02 + 0.015;
+                this.opacity = 1;
+                this.color = ['#ff003c', '#ff3300', '#ff9900', '#ffffff'][Math.floor(Math.random() * 4)];
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity;
+                this.opacity -= this.decay;
+                this.size = Math.max(0, this.size - 0.05);
+            }
+            draw() {
+                if (this.opacity <= 0) return;
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function renderCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw floating ambient embers
+            ambientEmbers.forEach(ember => {
+                ember.update();
+                ember.draw();
+            });
+
+            // Draw explosion particles
+            for (let i = explosionParticles.length - 1; i >= 0; i--) {
+                const p = explosionParticles[i];
+                p.update();
+                p.draw();
+                if (p.opacity <= 0) {
+                    explosionParticles.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(renderCanvas);
+        }
+        renderCanvas();
+
+
+        /* ==========================================================================
+           2. SYNTHESIZED WEB AUDIO API SOUND ENGINE
+           ========================================================================== */
+        let audioCtx = null;
+        let isAudioPlaying = false;
+        let synthBgmInterval = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Sound Effect Generators
+        function playFleeSFX() {
+            if (!audioCtx || !isAudioPlaying) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            } catch (e) {}
+        }
+
+        function playHoverSFX() {
+            if (!audioCtx || !isAudioPlaying) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } catch (e) {}
+        }
+
+        function playFlameBoomSFX() {
+            if (!audioCtx) return;
+            try {
+                // Low rumble bass boom
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.8);
+                gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.8);
+            } catch (e) {}
+        }
+
+        // Dramatic Background Music Synth Loop
+        function startBGM() {
+            if (synthBgmInterval) clearInterval(synthBgmInterval);
+            let step = 0;
+            const notes = [110, 110, 130.81, 110, 146.83, 130.81, 103.83, 110]; // Low dark cinematic progression
+            
+            synthBgmInterval = setInterval(() => {
+                if (!isAudioPlaying || !audioCtx) return;
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(notes[step % notes.length], audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.35);
+                    step++;
+                } catch (e) {}
+            }, 350);
+        }
+
+        // Visualizer equalizer bar animation
+        const eqBars = document.querySelectorAll('.eq-bar');
+        setInterval(() => {
+            if (isAudioPlaying) {
+                eqBars.forEach(bar => {
+                    const h = Math.floor(Math.random() * 16) + 4;
+                    bar.style.height = `${h}px`;
+                });
+            } else {
+                eqBars.forEach((bar, idx) => {
+                    bar.style.height = `${(idx + 1) * 4}px`;
+                });
+            }
+        }, 120);
+
+        // Audio Toggle Click
+        const audioToggleBtn = document.getElementById('audioToggle');
+        const audioIcon = document.getElementById('audioIcon');
+        const audioText = document.getElementById('audioText');
+
+        audioToggleBtn.addEventListener('click', () => {
+            initAudio();
+            isAudioPlaying = !isAudioPlaying;
+
+            if (isAudioPlaying) {
+                audioIcon.className = 'fa-solid fa-volume-high text-crimson-500';
+                audioText.textContent = 'SOUND ON';
+                startBGM();
+            } else {
+                audioIcon.className = 'fa-solid fa-volume-xmark text-crimson-500';
+                audioText.textContent = 'SOUND OFF';
+                if (synthBgmInterval) clearInterval(synthBgmInterval);
+            }
+        });
+
+
+        /* ==========================================================================
+           3. DODGING "NO" BUTTON (NEVER VANISHES & SAFE VIEWPORT BOUNDS)
+           ========================================================================== */
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const tauntBox = document.getElementById('tauntBox');
+        const angryEmojiIcon = document.getElementById('angryEmojiIcon');
+
+        const taunts = [
+            "Nice try, Simmi! Not a chance! 😡",
+            "Abhishek won't let you escape! 🔥",
+            "Too slow! Fate is already sealed!",
+            "NO is not an option here! 👺",
+            "Resistance is futile, Simmi! 🔥",
+            "You belong with Abhishek forever! ❤️‍🔥",
+            "Try again! The button moves faster than destiny!"
+        ];
+
+        let tauntIndex = 0;
+
+        function fleeButton(e) {
+            initAudio();
+            playFleeSFX();
+
+            // Bounce Angry Emoji on interaction
+            if (angryEmojiIcon) {
+                angryEmojiIcon.classList.add('animate-bounce');
+                setTimeout(() => angryEmojiIcon.classList.remove('animate-bounce'), 400);
+            }
+
+            // Spawn flame spark explosion around Angry Emoji
+            const badge = document.getElementById('angryEmojiBadge');
+            if (badge) {
+                const rect = badge.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                for (let i = 0; i < 15; i++) {
+                    explosionParticles.push(new ExplosionParticle(centerX, centerY));
+                }
+            }
+
+            // GUARANTEE NO BUTTON REMAINS FULLY VISIBLE & DISPLAYED
+            if (noBtn.style.position !== 'fixed') {
+                noBtn.style.position = 'fixed';
+            }
+            noBtn.style.display = 'block';
+            noBtn.style.opacity = '1';
+            noBtn.style.visibility = 'visible';
+
+            const btnWidth = noBtn.offsetWidth || 140;
+            const btnHeight = noBtn.offsetHeight || 48;
+
+            // Safe Padding Margins from screen edges
+            const margin = 24;
+            const minX = margin;
+            const minY = margin;
+            const maxX = Math.max(minX + 10, window.innerWidth - btnWidth - margin);
+            const maxY = Math.max(minY + 10, window.innerHeight - btnHeight - margin);
+
+            // Calculate new safe random coordinate within screen bounds
+            const newX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+            const newY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+
+            noBtn.style.left = `${newX}px`;
+            noBtn.style.top = `${newY}px`;
+
+            // Display humorous angry taunt
+            tauntBox.textContent = taunts[tauntIndex];
+            tauntBox.style.opacity = '1';
+            tauntIndex = (tauntIndex + 1) % taunts.length;
+        }
+
+        // Attach touch and hover events for dodging
+        noBtn.addEventListener('mouseenter', fleeButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            fleeButton(e);
+        });
+        noBtn.addEventListener('click', fleeButton);
+
+        // Angry Emoji Click Spark Generator
+        document.getElementById('angryEmojiBadge').addEventListener('click', () => {
+            initAudio();
+            playHoverSFX();
+            const badge = document.getElementById('angryEmojiBadge');
+            const rect = badge.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 30; i++) {
+                explosionParticles.push(new ExplosionParticle(centerX, centerY));
+            }
+        });
+
+        // Hover Sound for YES button
+        yesBtn.addEventListener('mouseenter', playHoverSFX);
+
+
+        /* ==========================================================================
+           4. "YES" BUTTON CELEBRATION & MODAL TRIGGER
+           ========================================================================== */
+        const victoryModal = document.getElementById('victoryModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        yesBtn.addEventListener('click', () => {
+            initAudio();
+            playFlameBoomSFX();
+
+            // Massive Flame Fireworks Burst across center screen
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            for (let i = 0; i < 180; i++) {
+                explosionParticles.push(new ExplosionParticle(centerX, centerY));
+            }
+
+            // Show Victory Modal
+            victoryModal.classList.remove('pointer-events-none');
+            victoryModal.classList.remove('opacity-0');
+            victoryModal.classList.add('opacity-100');
+
+            setTimeout(() => {
+                modalContent.classList.remove('scale-90');
+                modalContent.classList.add('scale-100');
+            }, 50);
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-90');
+            
+            setTimeout(() => {
+                victoryModal.classList.add('opacity-0');
+                victoryModal.classList.add('pointer-events-none');
+            }, 300);
+        });
+    </script>
+</body>
+</html>
